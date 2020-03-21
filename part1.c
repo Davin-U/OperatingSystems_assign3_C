@@ -3,7 +3,7 @@
 
 int main(int argc, char** argv) {
     FILE *pInFile, *pOutFile;
-    int i;
+    int i, j;
     
     // Check if files exist
     if(argc != 2){
