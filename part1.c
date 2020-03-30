@@ -7,7 +7,7 @@
 int main(int argc, char** argv) {
     FILE *pInFile, *pOutFile;
     int i, iFileSize;
-    unsigned long lBuffer;
+    unsigned long lAddress, lAddressM[8]; // logical memory address
     struct stat inFileInfo;
     
     if(argc != 3){ // comand line arguments
@@ -23,13 +23,13 @@ int main(int argc, char** argv) {
     
     // Get inFile's size in bytes
     stat(argv[1], &inFileInfo);
-    iFileSize = (int) inFileInfo.st_size;
+    iFileSize = ((int) inFileInfo.st_size / 8);
 
-    for(i = 0; i < iFileSize; i += 8){ // read every 8 bytes
-        fseek(pInFile, i, SEEK_SET);
-        fread(&lBuffer, 8, 1L, pInFile); // reads 8 bytes into lBuffer
-        printf("%d ", i);
-        printf("%lx\n", lBuffer);       
+    // populate logical memory address array
+    for(i = 0; i < iFileSize; i++){ // read every 8 bytes
+        fseek(pInFile, (i * 8), SEEK_SET);
+        fread(&lAddress, 8, 1L, pInFile); // reads 8 bytes into lBuffer
+        lAddressM[i] = lAddress;      
     }
     
     return 0;
