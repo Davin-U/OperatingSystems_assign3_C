@@ -18,14 +18,14 @@ int main(int argc, char** argv) {
     }
     
     // open inFile
-    pInFile = fopen(argv[1], "r");
+    pInFile = fopen(argv[1], "rb");
     if(pInFile == NULL){
         fprintf(stderr, "%s doesn't exist or is inaccessible\n", argv[1]);
         exit(1);
     }
 
     // open outFile
-    pOutFile = fopen(argv[2], "w+"); // new file created if not exist 
+    pOutFile = fopen(argv[2], "wb+"); // new file created if not exist 
     
     // Get inFile's size in bytes, initialize address arrays
     stat(argv[1], &inFileInfo);
@@ -46,8 +46,12 @@ int main(int argc, char** argv) {
             (iPageTableM[iFrameNum] * PAGE_SIZE) + iFrameOffset;
 
         // write to file
-        printf("Physical address: %lx\n", lPhysicalAddressM[i]);
+        fseek(pOutFile, (i * 8), SEEK_SET);
+        fwrite(&lPhysicalAddressM[i], 8, 1L, pOutFile);
     }
+
+    fclose(pInFile);
+    fclose(pOutFile);
 
     return 0;
 }
