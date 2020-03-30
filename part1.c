@@ -1,29 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 int main(int argc, char** argv) {
     FILE *pInFile, *pOutFile;
-    int i, j;
+    int i, iFileSize;
     unsigned long lBuffer;
+    struct stat inFileInfo;
     
-    printf("%d\n", argc);
-
-    // Check if files exist
-    if(argc != 3){
+    if(argc != 3){ // comand line arguments
         fprintf(stderr, "Usage: %s <infile> <outfile>\n", argv[0]);
         exit(1);
     }
 
-    pInFile = fopen(argv[1], "r");
+    pInFile = fopen(argv[1], "r"); // open file
     if(pInFile == NULL){
-        fprintf(stderr, "%s either doesn't exist or is inaccessible\n", argv[1]);
+        fprintf(stderr, "%s doesn't exist or is inaccessible\n", argv[1]);
         exit(1);
     }
     
-    for(i = 0; i < 64; i += 8){
+    // Get inFile's size in bytes
+    stat(argv[1], &inFileInfo);
+    iFileSize = (int) inFileInfo.st_size;
+
+    for(i = 0; i < iFileSize; i += 8){ // read every 8 bytes
         fseek(pInFile, i, SEEK_SET);
         fread(&lBuffer, 8, 1L, pInFile); // reads 8 bytes into lBuffer
-        printf("%lu\n", lBuffer);       
+        printf("%d ", i);
+        printf("%lx\n", lBuffer);       
     }
     
     return 0;
