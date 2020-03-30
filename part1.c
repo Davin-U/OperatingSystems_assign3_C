@@ -16,28 +16,37 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Usage: %s <infile> <outfile>\n", argv[0]);
         exit(1);
     }
-
-    pInFile = fopen(argv[1], "r"); // open file
+    
+    // open inFile
+    pInFile = fopen(argv[1], "r");
     if(pInFile == NULL){
         fprintf(stderr, "%s doesn't exist or is inaccessible\n", argv[1]);
         exit(1);
     }
+
+    // open outFile
+    pOutFile = fopen(argv[2], "w+"); // new file created if not exist 
     
-    // Get inFile's size in bytes, initialize logical address array
+    // Get inFile's size in bytes, initialize address arrays
     stat(argv[1], &inFileInfo);
     iFileSize = ((int) inFileInfo.st_size / 8);
-    unsigned long lAddressM[iFileSize]; // Logical Memory addresses
+    unsigned long lLogicalAddressM[iFileSize];
+    unsigned long lPhysicalAddressM[iFileSize];
 
-    // populate logical address array
+    // for each row in the file, calculate physical memory
     for(i = 0; i < iFileSize; i++){
         // populate logical address array
         fseek(pInFile, (i * 8), SEEK_SET); // every 8 bytes
-        fread(&lAddressM[i], 8, 1L, pInFile);
+        fread(&lLogicalAddressM[i], 8, 1L, pInFile);
 
         // generate physical address
-        iFrameNum = (int) lAddressM[i] / PAGE_SIZE;
-        iFrameOffset = (int) lAddressM[i] % PAGE_SIZE;
-        printf("%d, %d\n", iFrameNum, iFrameOffset);
+        iFrameNum = (int) lLogicalAddressM[i] / PAGE_SIZE;
+        iFrameOffset = (int) lLogicalAddressM[i] % PAGE_SIZE;
+        lPhysicalAddressM[i] = (unsigned long) 
+            (iPageTableM[iFrameNum] * PAGE_SIZE) + iFrameOffset;
+
+        // write to file
+        printf("Physical address: %lx\n", lPhysicalAddressM[i]);
     }
 
     return 0;
