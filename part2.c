@@ -1,15 +1,19 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <"assign3p2.h">
 
-#define PAGE_SIZE 128
+int iClock = 0;
 
 int main(int argc, char** argv) {
     FILE *pInFile, *pOutFile;
-    int i, iFileSize, iPageTableM[] = {2, 4, 1, 7, 3, 5, 6};
-    int iFrameNum, iFrameOffset;
+    int i, iFileSize;
+    int iPageNum, iOffset;
+    ptEntry iPageTableM[MAX_STACK_ELEM];
     struct stat inFileInfo;
     
     if(argc != 3){ // comand line arguments
@@ -31,23 +35,26 @@ int main(int argc, char** argv) {
     stat(argv[1], &inFileInfo);
     iFileSize = ((int) inFileInfo.st_size / 8);
     unsigned long lLogicalAddressM[iFileSize];
-    unsigned long lPhysicalAddressM[iFileSize];
 
     // for each row in the file, calculate physical memory
     for(i = 0; i < iFileSize; i++){
+        iCLOCK++;
+
         // populate logical address array
         fseek(pInFile, (i * 8), SEEK_SET); // every 8 bytes
         fread(&lLogicalAddressM[i], 8, 1L, pInFile);
 
         // generate physical address
-        iFrameNum = (int) lLogicalAddressM[i] / PAGE_SIZE;
-        iFrameOffset = (int) lLogicalAddressM[i] % PAGE_SIZE;
-        lPhysicalAddressM[i] = (unsigned long) 
-            (iPageTableM[iFrameNum] * PAGE_SIZE) + iFrameOffset;
+        iPageNum = (int) lLogicalAddressM[i] / PAGE_SIZE;
+        iOffset = (int) lLogicalAddressM[i] % PAGE_SIZE;
+        
+        // Print out info for each Physical address 
+        printf("Clock: %d, PageNum: %d, offset: %d\n"
+            , iCLOCK, iPageNum, iOffset);
 
         // write to file
         fseek(pOutFile, (i * 8), SEEK_SET);
-        fwrite(&lPhysicalAddressM[i], 8, 1L, pOutFile);
+        fwrite(&lLogicalAddressM[i], 8, 1L, pOutFile);
     }
 
     fclose(pInFile);
