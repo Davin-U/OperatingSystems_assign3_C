@@ -13,8 +13,8 @@ typedef struct
 
 typedef struct
 {
-    int bValid = FALSE;
-    int iPageNum = 0;
+    int bValid;
+    int iPageNum; 
 } ptEntry;
 
 // StackImp typedef defines how we implement a stack using an array

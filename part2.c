@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <"assign3p2.h">
+#include "assign3p2.h"
 
 int iClock = 0;
 
@@ -13,10 +13,13 @@ int main(int argc, char** argv) {
     FILE *pInFile, *pOutFile;
     int i, iFileSize;
     int iPageNum, iOffset;
-    ptEntry iPageTableM[MAX_STACK_ELEM];
+    ptEntry pageTableM[MAX_STACK_ELEM], tempEntry;
     struct stat inFileInfo;
+    Stack stackLRU = newStack();  // bottom value is LRU process
+    Stack stackTemp = newStack(); // we pop values onto it, pop back to LRU 
     
-    if(argc != 3){ // comand line arguments
+    // Check if command line args are valid
+    if(argc != 3){
         fprintf(stderr, "Usage: %s <infile> <outfile>\n", argv[0]);
         exit(1);
     }
@@ -36,29 +39,47 @@ int main(int argc, char** argv) {
     iFileSize = ((int) inFileInfo.st_size / 8);
     unsigned long lLogicalAddressM[iFileSize];
 
+    // Initialize pageTable array
+    tempEntry.bValid = FALSE;
+    tempEntry.iPageNum = 0;
+    for(i = 0; i < MAX_STACK_ELEM; i++){
+        pageTableM[i] = tempEntry;
+        printf("%d, %d\n", tempEntry.bValid, tempEntry.iPageNum);
+    }
+
+    /*
     // for each row in the file, calculate physical memory
     for(i = 0; i < iFileSize; i++){
-        iCLOCK++;
+        iClock++;
 
-        // populate logical address array
+        // populate logical address at index
         fseek(pInFile, (i * 8), SEEK_SET); // every 8 bytes
         fread(&lLogicalAddressM[i], 8, 1L, pInFile);
 
-        // generate physical address
+        // generate page number
         iPageNum = (int) lLogicalAddressM[i] / PAGE_SIZE;
         iOffset = (int) lLogicalAddressM[i] % PAGE_SIZE;
         
-        // Print out info for each Physical address 
+        // attempt to push page onto pageTable
+
+
+
+
+
+        // Print out info for each Virtual address
         printf("Clock: %d, PageNum: %d, offset: %d\n"
-            , iCLOCK, iPageNum, iOffset);
+            , iClock, iPageNum, iOffset);
 
         // write to file
         fseek(pOutFile, (i * 8), SEEK_SET);
         fwrite(&lLogicalAddressM[i], 8, 1L, pOutFile);
     }
+    */
 
     fclose(pInFile);
     fclose(pOutFile);
+    freeStack(stackLRU);
+    freeStack(stackTemp);
 
     return 0;
 }
