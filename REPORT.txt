@@ -1,1 +1,15 @@
 ceabc02825a5b908e474b053074ab53c  part1-output
+
+c95b27848ae8d4354d87678d075001f7  part2-output
+Part 2 page faults: 3210
+
+1. I didn't collaborate with anybody. 
+2. I think I did everything correct using the Stack implementation
+3. N/A
+4. This was probably one of the hardest assignments I've done. Mostly because Part2
+was not clear. I spent a lot of time implementing Stack functions and was too tired
+to even attempt Part3 even though I know how I would do it. If you could please make
+the instructions clearer when talking about the Page Index to Frame translation. 
+
+5. See above
+

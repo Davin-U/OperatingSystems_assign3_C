@@ -9,7 +9,7 @@
 
 int main(int argc, char** argv) {
     FILE *pInFile, *pOutFile;
-    int i, j, k, iFileSize, iClock = 0, bFindLRU;
+    int i, j, k, iFileSize, iClock = 0, bFindLRU, bJK;
     int iPageNum, iOffset, iPageFault = 0;
     ptEntry pageTableM[MAX_STACK_ELEM], tempEntry;
     struct stat inFileInfo;
@@ -71,6 +71,7 @@ int main(int argc, char** argv) {
                 element.iPageNum = iPageNum;
                 push(stackLRU, element);
                 bFindLRU = FALSE;
+                bJK = TRUE;
                 break;
             }
 
@@ -88,6 +89,7 @@ int main(int argc, char** argv) {
                     push(stackTemp, popped);
                 }
                 bFindLRU = FALSE;
+                bJK = TRUE;
                 break;
             }
         }
@@ -111,24 +113,27 @@ int main(int argc, char** argv) {
                             push(stackLRU, element);
                             break;
                         }
-
                     }
                     break;
                 }
                 push(stackTemp, popped);
             }
+            bJK = FALSE;
         }
 
-        // Print out info for each Virtual address
-        //printf("Clock: %d, PageNum: %d, offset: %d\n"
-        //    , iClock, iPageNum, iOffset);
+        // Calculate Physical Address
+        unsigned long lPhysicalAddress; 
+        if(bJK)
+            lPhysicalAddress = ((j + 1) * PAGE_SIZE) + iOffset;
+        else
+            lPhysicalAddress = ((k + 1) * PAGE_SIZE) + iOffset;
 
         // write to file
         fseek(pOutFile, (i * 8), SEEK_SET);
-        fwrite(&lLogicalAddressM[i], 8, 1L, pOutFile);
+        fwrite(&lPhysicalAddress, 8, 1L, pOutFile);
     }
-    
-    printf("%d\n", iPageFault);
+
+    printf("Part 2 page faults: %d\n", iPageFault);
 
     fclose(pInFile);
     fclose(pOutFile);
